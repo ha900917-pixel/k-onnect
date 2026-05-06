@@ -1043,7 +1043,27 @@
     }
   }
   fetchWeather();
-
+  // ✅ 스크롤 깊이 트래킹 (25 / 50 / 75 / 100%)
+  (function() {
+    const marks = [25, 50, 75, 100];
+    const fired = {};
+    window.addEventListener('scroll', function() {
+      const scrolled = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+      marks.forEach(function(m) {
+        if (scrolled >= m && !fired[m]) {
+          fired[m] = true;
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'scroll_depth', { depth_percent: m, page_title: document.title });
+          }
+          if (typeof fbq !== 'undefined') {
+            fbq('trackCustom', 'ScrollDepth', { depth_percent: m });
+          }
+        }
+      });
+    }, { passive: true });
+  })();
   function showPage(name) {
     // ✅ GA4 탭 전환 이벤트
     if (typeof gtag !== 'undefined') {
